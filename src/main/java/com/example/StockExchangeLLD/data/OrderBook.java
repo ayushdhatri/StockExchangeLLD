@@ -43,7 +43,28 @@ public class OrderBook implements IOrderBook {
 
 
     @Override
-    public void removeOrder(String orderId, String stockSymbol) {
+    public boolean removeOrder(String orderId, String stockSymbol) {
+        // Fetch the the lock first
+        ReadWriteLock lock = getOrCreateLock(stockSymbol);
+        lock.writeLock().lock();
+        try{
+            List<Order> orders = orderBook.get(stockSymbol);
+            if(orders != null){
+                boolean removed = orders.removeIf(order -> order.getOrderId().equals(orderId));
+                if(removed){
+                    log.info("Order removed from order book");
+                }
+                else{
+                    log.info("Order not found in order book");
+                }
+                return removed;
+            }
+            return false;
+        }
+        finally{
+            lock.writeLock().unlock();
+        }
+
 
     }
 

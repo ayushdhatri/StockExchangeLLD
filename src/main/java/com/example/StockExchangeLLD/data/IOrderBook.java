@@ -7,7 +7,7 @@ import java.util.List;
 public interface IOrderBook {
     void addOrder(Order order);
 
-    void removeOrder(String orderId, String stockSymbol);
+    boolean removeOrder(String orderId, String stockSymbol);
 
     List<Order> getOrders(String stockSymbol);
 
