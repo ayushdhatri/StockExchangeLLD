@@ -45,7 +45,7 @@ public class FIFOMatchingStrategy implements OrderMatchingStrategy{
         List<Trade> trades = new ArrayList<>();
         List<Order> matchingSellOrders = existingOrder.stream()
                 .filter(order -> order.getOrderType() == OrderType.SELL)
-                .filter(order -> order.getStockId().equals(newOrder.getStockId()))
+                .filter(order -> order.getStockSymbol().equals(newOrder.getStockSymbol()))
                 .filter(order -> order.getPrice() <= newOrder.getPrice())
                 .filter(order -> order.getOrderStatus().equals(OrderStatus.ACCEPTED))
                 .sorted(Comparator.comparing(Order::getPrice).thenComparing(Order::getOrderAcceptedTimeStamp))
@@ -60,7 +60,7 @@ public class FIFOMatchingStrategy implements OrderMatchingStrategy{
             Trade trade = Trade.builder()
                     .buyerOrderId(newOrder.getOrderId())
                     .sellerOrderId(sellOrder.getOrderId())
-                    .stockId(newOrder.getStockId())
+                    .stockId(newOrder.getStockSymbol())
                     .quantity(tradeQuantity)
                     .price(tradePrice)
                     .build();
@@ -86,7 +86,7 @@ public class FIFOMatchingStrategy implements OrderMatchingStrategy{
 
         List<Order> matchingBuyerOrder = existingOrder.stream()
                 .filter((order) -> order.getOrderType().equals(OrderType.BUY))
-                .filter(order -> order.getStockId().equals(sellOrder.getStockId()))
+                .filter(order -> order.getStockSymbol().equals(sellOrder.getStockSymbol()))
                 .filter(order -> order.getPrice() >= sellOrder.getPrice())
                 .filter(order -> order.getOrderStatus().equals(OrderStatus.ACCEPTED))
                 .sorted(Comparator.comparing(Order::getPrice, Comparator.reverseOrder()).thenComparing(Order::getOrderAcceptedTimeStamp))
@@ -101,7 +101,7 @@ public class FIFOMatchingStrategy implements OrderMatchingStrategy{
             Trade trade = Trade.builder()
                     .buyerOrderId(buyOrder.getOrderId())
                     .sellerOrderId(sellOrder.getOrderId())
-                    .stockId(sellOrder.getStockId())
+                    .stockId(sellOrder.getStockSymbol())
                     .quantity(tradeQuantity)
                     .price(tradePrice)
                     .build();

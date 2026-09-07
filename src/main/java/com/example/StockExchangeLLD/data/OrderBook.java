@@ -1,12 +1,18 @@
 package com.example.StockExchangeLLD.data;
 
 import com.example.StockExchangeLLD.models.Order;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+
+@Slf4j
 
 public class OrderBook implements IOrderBook {
 
@@ -16,8 +22,25 @@ public class OrderBook implements IOrderBook {
 
     @Override
     public void addOrder(Order order) {
+        // we  need to figure out the stock symbol
+        String stockSymbol = order.getStockSymbol();
 
+        // get the lock for particular stockSymbol
+        ReadWriteLock lock = getOrCreateLock(stockSymbol);
+        lock.writeLock().lock();
+        try{
+            orderBook.computeIfAbsent(stockSymbol, k -> new ArrayList<>()).add(order);// adding the order
+            log.info("Order added to order book: {} - {} - {} - {} - {}- {}", order.getOrderId(), order.getOrderStatus(),order.getOrderType(), order.getStockSymbol(), order.getPrice(), order.getQuantity());
+        }
+        finally{
+            lock.writeLock().unlock();// always unlock the symbol lock
+        }
     }
+
+    private ReadWriteLock getOrCreateLock(String stockSymbol){
+        return symbolLocks.computeIfAbsent(stockSymbol, k -> new ReentrantReadWriteLock());
+    }
+
 
     @Override
     public void removeOrder(String orderId, String stockSymbol) {

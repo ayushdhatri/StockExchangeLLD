@@ -27,7 +27,7 @@ public class Order {
     private OrderStatus orderStatus = OrderStatus.ACCEPTED;
 
     @NotNull(message = "Order cannot exist with stock")
-    private String stockId;
+    private String stockSymbol;
 
     @NotNull(message = "Quantity is required")
     private int quantity;
