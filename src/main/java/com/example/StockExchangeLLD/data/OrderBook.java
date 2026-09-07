@@ -70,11 +70,48 @@ public class OrderBook implements IOrderBook {
 
     @Override
     public List<Order> getOrders(String stockSymbol) {
-        return List.of();
+        ReadWriteLock lock = getOrCreateLock(stockSymbol);
+        lock.readLock().lock();
+        try{
+            List<Order> orders  = orderBook.get(stockSymbol);
+            if(orders != null){
+                log.info("Order fetched successfully for stock symbol : {}", stockSymbol);
+                return List.copyOf(orders);
+            }
+            else {
+                log.info("Order not found with stock symbol : {}", stockSymbol);
+                return List.of();
+            }
+        }
+        finally{
+            lock.readLock().unlock();
+
+        }
     }
 
     @Override
     public boolean updateOrder(Order updatedOrder) {
-        return false;
+        // here we can first remove this order
+        // and then add this updateOrder
+        ReadWriteLock lock = getOrCreateLock(updatedOrder.getStockSymbol());
+        lock.writeLock().lock();
+        try{
+            List<Order> orders = orderBook.get(updatedOrder.getStockSymbol());
+            boolean hasOrder = orders.removeIf(order -> order.getOrderId().equals(updatedOrder.getOrderId()));
+            if(hasOrder){
+                orders.add(updatedOrder);
+                log.info("Existing order has been updateed successfully");
+                return true;
+            }
+            else {
+                // order does not exist
+                // we cannot update the order
+                log.info("Order does not exist with id: {} ", updatedOrder.getOrderId());
+                return false;
+            }
+        }
+        finally{
+            lock.writeLock().unlock();
+        }
     }
 }
