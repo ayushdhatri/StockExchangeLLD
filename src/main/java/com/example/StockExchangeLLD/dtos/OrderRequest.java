@@ -1,4 +1,4 @@
-package com.example.StockExchangeLLD;
+package com.example.StockExchangeLLD.dtos;
 
 import com.example.StockExchangeLLD.models.OrderType;
 import lombok.AllArgsConstructor;
