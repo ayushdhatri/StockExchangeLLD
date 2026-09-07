@@ -14,5 +14,7 @@ public interface IOrderBook {
 
     boolean updateOrder(Order updatedOrder);
 
+    Optional<Order> getOrderByOrderId(String orderId);
+
 }
 

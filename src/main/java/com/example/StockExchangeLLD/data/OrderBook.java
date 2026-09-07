@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -114,6 +115,29 @@ public class OrderBook implements IOrderBook {
         finally{
             lock.writeLock().unlock();
         }
+    }
+
+    @Override
+    public Optional<Order> getOrderByOrderId(String orderId) {
+
+        for(Map.Entry<String, List<Order>> entry : orderBook.entrySet()){
+            String stockSymbol = entry.getKey();
+            List<Order> stockSymbolOrders = entry.getValue();
+            ReadWriteLock lock = symbolLocks.get(stockSymbol);
+            lock.readLock().lock();
+            try {
+                for (Order order : stockSymbolOrders) {
+                    if (order.getOrderId().equals(orderId)) {
+                        // this is the order that we are supposed to return
+                        return Optional.of(order);
+                    }
+                }
+            }
+            finally{
+                lock.readLock().unlock();
+            }
+        }
+        return Optional.empty();
     }
 
 }
