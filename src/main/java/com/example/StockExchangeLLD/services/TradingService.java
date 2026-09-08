@@ -23,6 +23,8 @@ public class TradingService {
 
     private final OrderMatchingStrategy orderMatchingStrategy;
 
+    private final TradeService tradeService;// violating dependency principle
+
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     public Order placeOrder(Order order){
@@ -56,6 +58,8 @@ public class TradingService {
         if(!executedTrades.isEmpty()){
             for(Trade trade : executedTrades){
                 // save trades in the db or in-memory
+                tradeService.addTrade(trade);
+
 
             }
             orderBook.updateOrder(newOrder);

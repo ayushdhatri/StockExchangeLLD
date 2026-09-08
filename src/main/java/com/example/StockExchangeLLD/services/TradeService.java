@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-
 public class TradeService {
     private final Map<String, Trade> trades = new ConcurrentHashMap<>();
 
