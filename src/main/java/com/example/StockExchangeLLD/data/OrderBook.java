@@ -1,8 +1,10 @@
 package com.example.StockExchangeLLD.data;
 
 import com.example.StockExchangeLLD.models.Order;
+import jakarta.persistence.Column;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 @Slf4j
-
+@Component
 public class OrderBook implements IOrderBook {
 
     private final ConcurrentMap<String, List<Order>> orderBook = new ConcurrentHashMap<>();
