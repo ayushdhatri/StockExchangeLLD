@@ -83,4 +83,8 @@ public class TradingService {
         }
 
     }
+
+    public List<Order> getOrderBySymbol(String symbol){
+        return orderBook.getOrders(symbol);
+    }
 }
