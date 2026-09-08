@@ -1,6 +1,7 @@
 package com.example.StockExchangeLLD.services;
 
 import com.example.StockExchangeLLD.data.IOrderBook;
+import com.example.StockExchangeLLD.dtos.OrderRequest;
 import com.example.StockExchangeLLD.models.Order;
 import com.example.StockExchangeLLD.models.OrderStatus;
 import com.example.StockExchangeLLD.models.OrderType;
@@ -27,7 +28,16 @@ public class TradingService {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    public Order placeOrder(Order order){
+    public Order placeOrder(OrderRequest orderRequest){
+        Order order = Order.builder()
+                        .userId(orderRequest.getUserId())
+                        .orderType(orderRequest.getOrderType())
+                        .stockSymbol(orderRequest.getStockSymbol())
+                        .quantity(orderRequest.getQuantity())
+                        .price(orderRequest.getPrice())
+                        .build();
+
+
 
         order.setOrderAcceptedTimeStamp(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.ACCEPTED);
@@ -37,7 +47,7 @@ public class TradingService {
 
         executorService.submit(() -> {
            try{
-               executeOrderMatch(order);
+               executeOrderMatch(order);// this task is done async
            }
            catch(Exception ex){
                log.error("Error executing order match");

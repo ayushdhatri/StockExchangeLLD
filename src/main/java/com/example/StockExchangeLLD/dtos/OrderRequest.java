@@ -15,7 +15,7 @@ public class OrderRequest {
 
     private OrderType orderType;
 
-    private String stockId;
+    private String stockSymbol;
 
     private int quantity;
 
